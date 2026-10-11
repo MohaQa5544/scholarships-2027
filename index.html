@@ -210,6 +210,7 @@ footer{border-top:1px solid var(--line);padding-top:16px;font-size:.875rem;color
     <details class="more" id="more-filters" style="margin-top:10px">
       <summary>فلاتر إضافية وترتيب</summary>
       <div class="selects">
+        <label>التخصص<select id="f-field"><option value="">كل التخصصات</option><option value="med">تشمل التخصصات الطبية</option><option value="tech">تشمل التخصصات التقنية</option><option value="both">الطبية والتقنية معاً</option></select></label>
         <label>المنطقة<select id="f-region"><option value="">كل المناطق</option></select></label>
         <label>الدولة<select id="f-country"><option value="">كل الدول</option></select></label>
         <label>حجم التمويل<select id="f-cov"><option value="">الكل</option></select></label>
@@ -487,7 +488,7 @@ function showTab(t){
 }
 function resetFilters(){
   F={q:'',status:{},med:false,tech:false,region:'',country:'',cov:'',syr:'',res:'',fy:'',ptype:'',mark:'',sort:'urgency'};
-  $('q').value=''; ['f-region','f-country','f-cov','f-syr','f-res','f-fy','f-ptype','f-mark'].forEach(function(id){ $(id).value=''; }); $('f-sort').value='urgency';
+  $('q').value=''; ['f-field','f-region','f-country','f-cov','f-syr','f-res','f-fy','f-ptype','f-mark'].forEach(function(id){ $(id).value=''; }); $('f-sort').value='urgency';
   renderChips(); renderBoard();
 }
 function jumpTo(i){
@@ -499,7 +500,8 @@ function jumpTo(i){
 function fillDetail(d){ if(d.getAttribute('data-filled')) return; var e=E[+d.getAttribute('data-i')]; if(!e) return; d.insertAdjacentHTML('beforeend',detailHTML(e)); d.setAttribute('data-filled','1'); }
 
 document.querySelector('.tabs').addEventListener('click',function(ev){ var b=ev.target.closest('.tab'); if(!b) return; var t=b.getAttribute('data-tab'); showTab(t); try{ history.replaceState(null,'','#'+t); }catch(e){} });
-$('fchips').addEventListener('click',function(ev){ var b=ev.target.closest('.chip'); if(!b) return; var k=b.getAttribute('data-f'); F[k]=!F[k]; renderChips(); renderBoard(); });
+$('fchips').addEventListener('click',function(ev){ var b=ev.target.closest('.chip'); if(!b) return; var k=b.getAttribute('data-f'); F[k]=!F[k]; $('f-field').value=(F.med&&F.tech)?'both':(F.med?'med':(F.tech?'tech':'')); renderChips(); renderBoard(); });
+$('f-field').addEventListener('change',function(){ var v=this.value; F.med=(v==='med'||v==='both'); F.tech=(v==='tech'||v==='both'); renderChips(); renderBoard(); });
 $('chips').addEventListener('click',function(ev){ var b=ev.target.closest('.chip'); if(!b) return; var k=b.getAttribute('data-st'); F.status[k]=!F.status[k]; renderChips(); renderBoard(); });
 var qT=null; $('q').addEventListener('input',function(){ clearTimeout(qT); var v=this.value; qT=setTimeout(function(){ F.q=normAr(v.trim()); renderBoard(); },120); });
 [['f-region','region'],['f-country','country'],['f-cov','cov'],['f-syr','syr'],['f-res','res'],['f-fy','fy'],['f-ptype','ptype'],['f-mark','mark'],['f-sort','sort']].forEach(function(p){ $(p[0]).addEventListener('change',function(){ F[p[1]]=this.value; renderBoard(); }); });
